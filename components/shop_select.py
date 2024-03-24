@@ -1,6 +1,6 @@
 import disnake
 from disnake.ext import commands
-from utils.data_shop import ShopDB
+from utils.data_shop import ShopDB # методы базы данных
 
 class ShopView(disnake.ui.View):
     def __init__(self, embeds, interaction, selects):
@@ -13,7 +13,7 @@ class ShopView(disnake.ui.View):
         for emb in self.embeds:
             emb.set_footer(text=f'Страница {self.embeds.index(emb) + 1}/{len(self.embeds)}')
 
-    async def update_view(self):
+    async def update_view(self): # обновление страницы и компонентов в зависимости от страницы(список ролей и роли внутри селекта совпадают)
         offset = self.offset
         self.clear_items()
         self.add_item(self.selects[self.offset])
@@ -34,7 +34,7 @@ class ShopView(disnake.ui.View):
             embed.set_thumbnail(url=interaction.author.display_avatar)
             return await interaction.response.send_message(embed=embed, ephemeral=True)
         
-        if 'roleshop_' in interaction.component.custom_id:
+        if 'roleshop_' in interaction.component.custom_id: # методы селекта 
             selected_option = interaction.values[0] if interaction  .values else None
             if not selected_option:
                 return False  # Не выбрана роль
@@ -85,13 +85,13 @@ class ShopView(disnake.ui.View):
     async def back(self, _, interaction: disnake.MessageInteraction):
         self.offset -= 1
         await self.update_view()
-        await interaction.response.edit_message(embed=self.embeds[self.offset], view=self)
+        await interaction.response.edit_message(embed=self.embeds[self.offset], view=self) # предыдущая страница
 
     @disnake.ui.button(style=disnake.ButtonStyle.grey, emoji='➡️', row=1)
     async def forward(self, _, interaction: disnake.MessageInteraction):
         self.offset += 1
         await self.update_view()
-        await interaction.response.edit_message(embed=self.embeds[self.offset], view=self)
+        await interaction.response.edit_message(embed=self.embeds[self.offset], view=self) # следующая страница
 
     @disnake.ui.button(emoji='🗑', style=disnake.ButtonStyle.red, row=1)
     async def close(self, _, interaction: disnake.MessageInteraction):

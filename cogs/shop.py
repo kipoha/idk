@@ -1,7 +1,7 @@
 import disnake
 from disnake.ext import commands
-from utils.data_shop import ShopDB
-from components.shop_select import ShopView
+from utils.data_shop import ShopDB # методы базы данных
+from components.shop_select import ShopView # компоненты для магазина
 
 class RoleShop(commands.Cog):
     def __init__(self, bot):
@@ -10,14 +10,14 @@ class RoleShop(commands.Cog):
 
     @commands.slash_command(name="магазин", description="Показать магазин ролей")
     async def shop(self, interaction):
-        embeds = await self.db.get_shop(interaction)
-        selects = await self.db.get_selects_shop(interaction)
+        embeds = await self.db.get_shop(interaction) # список ролей в эмбеде
+        selects = await self.db.get_selects_shop(interaction) # селекты с ролями
 
         if not selects or not embeds:
-            return await interaction.response.send_message(f'Магазин ролей пуст', ephemeral=True)
+            return await interaction.response.send_message(f'Магазин ролей пуст', ephemeral=True) # возвращает при условии отсутсвия ролей в магазине
 
-        view = ShopView(embeds, interaction, selects)
-        view.add_item(selects[0])
+        view = ShopView(embeds, interaction, selects) # компоненты мазагина
+        view.add_item(selects[0]) # добавление первую страницу селекта
         await interaction.response.send_message(embed=embeds[0], view=view)
 
 
@@ -35,14 +35,6 @@ class RoleShop(commands.Cog):
         role_id = role.id
         await self.db.remove_role_from_store(role_id)
         await interaction.send(f"Роль {role.mention} удалена из магазина.")  
-
-    @commands.slash_command(description="Удалить пользователя из базы данных")
-    @commands.has_permissions(administrator=True)
-    async def remove_member(self, interaction, member: disnake.Member):
-        user = member
-        await self.db.remove_member(user)
-        await self.db.remove_tran(user)
-        await interaction.send(f"{member.mention}")
 
 def setup(bot):
     bot.add_cog(RoleShop(bot))
